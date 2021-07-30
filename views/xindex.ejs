@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+
+<html> 
+<body>
+  <p> Going to create a basic login form </p>
+	<form action="/users" method="POST">
+    <!-- <label for="uname">Username:</label><br> -->
+		<input type="text" id="uname" name="uname"><br>
+		<!-- <label for="pword">Password:</label><br> -->
+		<input type="text" id="pword" name="pword"><br>
+		<input type="submit" value="Submit">
+	</form>
+
+
+	<script src="https://unpkg.com/react@17/umd/react.development.js" crossorigin></script>
+	<script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js" crossorigin></script>
+
+	<div id="submit_button_container"></div>
+
+	<!-- Load our React component. -->
+	<script src="javascripts/submit_button.js"></script>
+</body>
+</html>
