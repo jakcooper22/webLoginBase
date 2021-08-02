@@ -89,7 +89,6 @@ router.get('/image', function(req, res, next) {
 		}else {
 			row.forEach(function(item){
 				//console.log(item.img);
-				//let buff = new Buffer(item.img, 'base64');
 				res.end(item.img);
 			});
 		};
