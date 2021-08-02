@@ -1,22 +1,34 @@
 var express = require('express');
 var sqlite3 = require('sqlite3').verbose();
-//var db = new sqlite3.Database('../newTableTest');
+//var db = new sqlite3.Database("db/newTableTest");
 var md5 = require('md5');
 var jwt = require('jsonwebtoken');
 var router = express.Router();
 
+var errorMsg = {
+  "message" : "failed",
+	"status" : "no password"
+}
+
 /* GET users listing. */
 router.post('/users', function(req, res, next) {
-  var db = new sqlite3.Database("db/newTableTest");
-  db.run('Create table usersTable(userId int, username varchar, password varchar)', (error) => {
+	var db = new sqlite3.Database("db/newTableTest");
+	console.log(req.body);
+  db.run('Create table usersTable(userId integer primary key autoincrement,' +  
+	       'username varchar, password varchar, email varchar)', (error) => {
     if (error) {
-      db.run('insert into usersTable(userId, username, password) values(?,?,?)',
-              [1234, req.body.uname, md5(req.body.pword)], (err) => {
+			if (req.body.pword == ''){
+				console.log('password is blank');
+				res.json(errorMsg);
+			  return;
+			}
+			console.log('going to insert');
+      db.run('insert into usersTable(email, username, password) values(?,?,?)',
+              [req.body.email, req.body.uname, md5(req.body.pword)], (err) => {
         if (err) {
-          console.log(err);
+					res.json(errorMsg);
         } else {
           console.log('inserted new user into table and db is already created');  
-          db.close();
           const token = jwt.sign({"uname":req.body.uname, 
                                   "pword":md5(req.body.pword)},
                                   "piauwhakjsdnfakjsdhf34980745ljkhaaf",
@@ -33,8 +45,8 @@ router.post('/users', function(req, res, next) {
       });
     } else {
       console.log('table created');
-      db.run('insert into usersTable(userId, username, password) values(?,?,?)',
-              [1234, req.body.uname, md5(req.body.pword)], (err) => {
+      db.run('insert into usersTable(email, username, password) values(?,?,?)',
+              [req.body.email, req.body.uname, md5(req.body.pword)], (err) => {
         if (err) {
           console.log(err);
           res.json({
@@ -49,11 +61,35 @@ router.post('/users', function(req, res, next) {
           res.json({
             "message" : "user inserted"
           });
-          db.close();          
         }
       });
     };
   });
+	db.close();
+});
+
+router.post('/users/tokenPage', function(req, res, next) {
+  var db = new sqlite3.Database("db/newTableTest");
+	try {
+	  console.log('hit users/token');
+    console.log(req.body);	
+	  const decodedToken = jwt.verify(req.body.token, "piauwhakjsdnfakjsdhf34980745ljkhaaf");
+	  console.log(decodedToken.uname);
+		db.all('select userPage ' +
+		       'from userPages a ' +
+           'join usersTable b ' + 
+					 'on b.username = \'' + String(decodedToken.uname) + '\'', function(err, rows) {
+		  if (!err) {
+				rows.forEach(function(row) {
+          console.log(row);
+				});
+			} else {
+				console.log(err);
+			};
+		});				
+	} catch (error) {
+    console.log(error);
+	}
 });
 
 module.exports = router;
