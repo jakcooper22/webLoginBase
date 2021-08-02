@@ -1,22 +1,25 @@
 <!DOCTYPE html>
 
 <html> 
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <body>
-  <p> Going to create a basic login form </p>
-	<form action="/users" method="POST">
-		<input type="text" id="uname" name="uname"><br>
-		<input type="text" id="pword" name="pword"><br>
-		<input type="submit" value="Submit">
-	</form>
-
-	<p> Above is a version for a login </p>
-
 	<div id="login">
 		<p>User <input type="text" id="username"></p>
 		<p>Email <input type="text" id="email"></p>
 		<p>Password <input type="password" id="password"></p>
 		<button onclick="loginUser()">Log In</button>
+		<button onclick="newUser()">Create New User</button>
 	</div>
+
+	<div id="image">
+		<img id="imageTest">
+
+		</img>
+	</div>
+
+	<style>
+		
+	</style>
 
 	<script src="https://unpkg.com/react@17/umd/react.development.js" crossorigin></script>
 	<script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js" crossorigin></script>
@@ -25,7 +28,7 @@
 	<script src="javascripts/submit_button.js"></script> -->
 
 	<script>	
-		function loginUser() {
+		function newUser() {
       var uname = document.getElementById("username").value;	
 			var pword = document.getElementById("password").value;
 			var email = document.getElementById("email").value;
@@ -34,15 +37,35 @@
 			xhttp.onreadystatechange = function () {
 				if (this.readyState == 4 && this.status == 200) {
 					const token = JSON.parse(this.responseText);
+					if (token.message == "failed"){
+						console.log('failed to login');
+						window.alert('could not create account. Please try again!');
+						return;
+					};
+					console.log(token);
 					window.localStorage.setItem("token", token.token);
 					var storageToken = localStorage.getItem("token");
 					verifyToken(storageToken);
 				};
 			};
-			xhttp.open("POST", "/users", true);
+			xhttp.open("POST", "/newUsers", true);
 			xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 			xhttp.send("uname=" + uname + "&pword=" + pword + "&email=" + email);
-		}
+		};
+
+		function loginUser() {
+			var xhttp = new XMLHttpRequest();
+      var storedToken = localStorage.getItem("token");
+			xhttp.onreadystatechange = function() {
+				if (this.readyState == 4 && this.status == 200) {
+
+				};
+			};
+			xhttp.open("POST", "/loginUser", true);
+			console.log(storedToken);
+			xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+			xhttp.send("token=" + storedToken);
+		};
 
 		function verifyToken(token) {
 			console.log(token);

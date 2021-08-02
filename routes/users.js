@@ -11,12 +11,14 @@ var errorMsg = {
 }
 
 /* GET users listing. */
-router.post('/users', function(req, res, next) {
+router.post('/newUsers', function(req, res, next) {
 	var db = new sqlite3.Database("db/newTableTest");
-	console.log(req.body);
   db.run('Create table usersTable(userId integer primary key autoincrement,' +  
 	       'username varchar, password varchar, email varchar)', (error) => {
+	  //sql table aready exists
     if (error) {
+			console.log(error);
+			console.log(req.body);
 			if (req.body.pword == ''){
 				console.log('password is blank');
 				res.json(errorMsg);
@@ -26,6 +28,7 @@ router.post('/users', function(req, res, next) {
       db.run('insert into usersTable(email, username, password) values(?,?,?)',
               [req.body.email, req.body.uname, md5(req.body.pword)], (err) => {
         if (err) {
+					console.log(err);
 					res.json(errorMsg);
         } else {
           console.log('inserted new user into table and db is already created');  
@@ -66,6 +69,29 @@ router.post('/users', function(req, res, next) {
     };
   });
 	db.close();
+});
+
+router.post('/loginUser', function(req, res, next) {
+  console.log(req.body);
+	try {
+	  const decodeToken = jwt.verify(req.body.token, "piauwhakjsdnfakjsdhf34980745ljkhaaf");
+		console.log(decodeToken);
+	} catch (error) {
+	  console.log(error);
+	};
+});
+
+router.get('/image', function(req, res, next) {
+  var db = new sqlite3.Database("db/newTableTest");
+	db.all('select * from imageTest', function(err, row) {
+    if (err){
+			console.log(err);
+		}else {
+			console.log('might be working');
+			res.header('Content-Type', 'image.jpeg');
+			res.end(JSON.stringify(row));
+		};
+	});
 });
 
 router.post('/users/tokenPage', function(req, res, next) {
