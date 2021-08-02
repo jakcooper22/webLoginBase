@@ -87,9 +87,11 @@ router.get('/image', function(req, res, next) {
     if (err){
 			console.log(err);
 		}else {
-			console.log('might be working');
-			res.header('Content-Type', 'image.jpeg');
-			res.end(JSON.stringify(row));
+			row.forEach(function(item){
+				//console.log(item.img);
+				//let buff = new Buffer(item.img, 'base64');
+				res.end(item.img);
+			});
 		};
 	});
 });

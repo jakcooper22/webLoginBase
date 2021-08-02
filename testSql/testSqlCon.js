@@ -17,7 +17,7 @@ function test2(){
 
 function test3(){
 	var path = ( __dirname, '../public/images/imgtest.png');
-  var img = fs.readFileSync(path);
+  var img = fs.readFileSync(path).toString('base64');
 	console.log(img);
   db.run('insert into imageTest(img) values(?)', img, function(err){
 		if (err) {

@@ -15,17 +15,12 @@
 		<img id="imageTest">
 
 		</img>
+		<button onclick="imageTest()">Image Test</button>
 	</div>
 
 	<style>
 		
 	</style>
-
-	<script src="https://unpkg.com/react@17/umd/react.development.js" crossorigin></script>
-	<script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js" crossorigin></script>
-
-	<!-- Load our React component. 
-	<script src="javascripts/submit_button.js"></script> -->
 
 	<script>	
 		function newUser() {
@@ -78,6 +73,17 @@
 			xhttp.open("POST", "/users/tokenPage", true);
 			xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 			xhttp.send("token=" + token);
+		};
+
+		function imageTest() {
+			var xhttp = new XMLHttpRequest();
+			xhttp.onreadystatechange = function () {
+				if (this.readyState == 4 && this.status == 200) {
+					document.getElementById("imageTest").setAttribute('src', 'data:image/png;base64,' + this.response);
+				};
+			};
+			xhttp.open("GET", "/image", true);
+			xhttp.send();
 		};
 	</script>
 </body>
