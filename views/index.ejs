@@ -12,14 +12,27 @@
 	</div>
 
 	<div id="image">
-		<img id="imageTest">
-
-		</img>
+		<img class="center-fit" id="imageTest"></img>
 		<button onclick="imageTest()">Image Test</button>
 	</div>
 
 	<style>
-		
+	  .login {
+			width:300px;
+			float:left;
+		}
+		input {
+			display: inline-block;
+			float: right;
+		}
+		img {
+			width=200px;
+			height=200px;
+		}
+		.center-fit{
+			margin:auto;
+
+		}
 	</style>
 
 	<script>	
@@ -31,6 +44,7 @@
 			var xhttp = new XMLHttpRequest();
 			xhttp.onreadystatechange = function () {
 				if (this.readyState == 4 && this.status == 200) {
+					console.log(this.responseText);
 					const token = JSON.parse(this.responseText);
 					if (token.message == "failed"){
 						console.log('failed to login');

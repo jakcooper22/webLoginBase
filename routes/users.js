@@ -77,7 +77,7 @@ router.post('/newUsers', function(req, res, next) {
     };
   });
 	db.close();
-	res.end();
+	//res.end();
 });
 
 router.post('/loginUser', function(req, res, next) {
