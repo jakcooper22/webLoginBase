@@ -53,7 +53,10 @@
       var storedToken = localStorage.getItem("token");
 			xhttp.onreadystatechange = function() {
 				if (this.readyState == 4 && this.status == 200) {
-
+					var page = this.response;
+					console.log(page);
+					//window.location = this.response;
+					document.write(page);
 				};
 			};
 			xhttp.open("POST", "/loginUser", true);

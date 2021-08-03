@@ -5,36 +5,45 @@ var md5 = require('md5');
 var jwt = require('jsonwebtoken');
 var router = express.Router();
 
-var errorMsg = {
+var errMsgPword = {
   "message" : "failed",
 	"status" : "no password"
 }
 
+var errMsgEmail = {
+	"message" : "failed",
+	"status" : "email is in use"
+};
+
 /* GET users listing. */
 router.post('/newUsers', function(req, res, next) {
 	var db = new sqlite3.Database("db/newTableTest");
-  db.run('Create table usersTable(userId integer primary key autoincrement,' +  
-	       'username varchar, password varchar, email varchar)', (error) => {
+	var sqlCreate = 'create table usersTable(userId integer primary key autoincrement,' +
+	                'username varchar, password varchar, email varchar)';
+	var sqlInsert = 'insert into usersTable(email, username, password) values(?,?,?)';
+
+  db.run(sqlCreate, (error) => {
 	  //sql table aready exists
     if (error) {
 			console.log(error);
 			console.log(req.body);
 			if (req.body.pword == ''){
 				console.log('password is blank');
-				res.json(errorMsg);
+				res.json(errMsgPword);
 			  return;
 			}
 			console.log('going to insert');
-      db.run('insert into usersTable(email, username, password) values(?,?,?)',
-              [req.body.email, req.body.uname, md5(req.body.pword)], (err) => {
+      db.run(sqlInsert, [req.body.email, req.body.uname, md5(req.body.pword)], (err) => {
         if (err) {
 					console.log(err);
-					res.json(errorMsg);
+					res.json(errMsgPword);
         } else {
           console.log('inserted new user into table and db is already created');  
-          const token = jwt.sign({"uname":req.body.uname, 
-                                  "pword":md5(req.body.pword)},
-                                  "piauwhakjsdnfakjsdhf34980745ljkhaaf",
+          const token = jwt.sign({
+																	"uname":req.body.uname, 
+                                  "email":req.body.email 
+																	},
+                                    "piauwhakjsdnfakjsdhf34980745ljkhaaf",
                                  {
                                    expiresIn: "2h"
                                  });
@@ -48,8 +57,7 @@ router.post('/newUsers', function(req, res, next) {
       });
     } else {
       console.log('table created');
-      db.run('insert into usersTable(email, username, password) values(?,?,?)',
-              [req.body.email, req.body.uname, md5(req.body.pword)], (err) => {
+      db.run(sqlInsert, [req.body.email, req.body.uname, md5(req.body.pword)], (err) => {
         if (err) {
           console.log(err);
           res.json({
@@ -69,17 +77,47 @@ router.post('/newUsers', function(req, res, next) {
     };
   });
 	db.close();
+	res.end();
 });
 
 router.post('/loginUser', function(req, res, next) {
-  console.log(req.body);
+	var db = new sqlite3.Database("db/newTableTest");
+  //console.log(req.body);
 	try {
-	  const decodeToken = jwt.verify(req.body.token, "piauwhakjsdnfakjsdhf34980745ljkhaaf");
-		console.log(decodeToken);
+	  const decodedToken = jwt.verify(req.body.token, "piauwhakjsdnfakjsdhf34980745ljkhaaf");
+		//console.log(decodedToken);
+		db.all('select userPage ' +
+					 'from userPages a ' +
+					 'join usersTable b ' +
+					 'on a.userId = b.userId ' +
+					 'and b.email = \'' + decodedToken.email + '\'', function(err, rows) {
+			if (!err) {
+				console.log(rows);
+				rows.forEach(function(item){
+					console.log('retruned sql' + item);
+					if (item.userPage == 'bronzePage'){
+						console.log('going to send bronze page');
+						res.redirect('/bronzePage');
+					};
+				});
+			}else {
+				console.log(err);
+			};
+		});	
 	} catch (error) {
 	  console.log(error);
 	};
 });
+
+//router.get('/bronzePage', function(req, res, next){
+//	console.log('trying to open bronze page');
+//	try {
+//    res.render('bronzePage');
+//	} catch(err) {
+//		console.log(err);
+//	};
+//	res.end();
+//});
 
 router.get('/image', function(req, res, next) {
   var db = new sqlite3.Database("db/newTableTest");
